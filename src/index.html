@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YOLO 手势控制中心</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">YO</div>
+          <div>
+            <h1>YOLO Control</h1>
+            <p>手势驱动工作流</p>
+          </div>
+        </div>
+        <nav class="nav">
+          <button class="nav-link is-active" data-target="dashboard">主控制台</button>
+          <button class="nav-link" data-target="mapping">手势映射</button>
+          <button class="nav-link" data-target="system">系统设置</button>
+        </nav>
+        <div class="sidebar-footer">
+          <span>Electron v<span id="electron-version">-</span></span>
+          <span class="status-pill">已连接摄像头</span>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section id="dashboard" class="panel is-visible">
+          <header class="panel-header">
+            <div>
+              <h2>实时预览</h2>
+              <p>摄像头预览、系统状态与手势记录</p>
+            </div>
+            <div class="header-actions">
+              <label class="toggle">
+                <input type="checkbox" id="gesture-toggle" checked />
+                <span class="toggle-track"></span>
+                <span class="toggle-label">启用手势</span>
+              </label>
+              <button class="btn ghost" id="reset-log">清空日志</button>
+            </div>
+          </header>
+
+          <div class="grid two-columns">
+            <div class="card preview-card">
+              <div class="card-header">
+                <h3>摄像头预览</h3>
+                <span class="badge">1280 × 720</span>
+              </div>
+              <div class="preview-window">
+                <div class="preview-overlay">
+                  <div>
+                    <p class="preview-title">Camera Feed</p>
+                    <p class="preview-subtitle">实时画面将显示在此处</p>
+                  </div>
+                </div>
+                <div class="reticle"></div>
+              </div>
+            </div>
+
+            <div class="stack">
+              <div class="card">
+                <div class="card-header">
+                  <h3>系统状态</h3>
+                </div>
+                <div class="status-grid">
+                  <div>
+                    <p class="label">识别状态</p>
+                    <p class="value" id="recognition-status">运行中</p>
+                  </div>
+                  <div>
+                    <p class="label">当前手势</p>
+                    <p class="value" id="current-gesture">右滑</p>
+                  </div>
+                  <div>
+                    <p class="label">灵敏度</p>
+                    <div class="slider-row">
+                      <input type="range" id="sensitivity" min="1" max="10" value="6" />
+                      <span id="sensitivity-value">6</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p class="label">识别延迟</p>
+                    <p class="value">38 ms</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h3>手势日志</h3>
+                  <span class="badge" id="log-count">6 条</span>
+                </div>
+                <ul class="log-list" id="gesture-log">
+                  <li>10:21:14 右滑 → 切换到下一页</li>
+                  <li>10:20:52 左滑 → 返回上一页</li>
+                  <li>10:20:31 握拳 → 暂停播放</li>
+                  <li>10:20:05 张开手 → 打开投影</li>
+                  <li>10:19:48 右滑 → 切换到下一页</li>
+                  <li>10:19:14 OK 手势 → 打开讲稿</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="mapping" class="panel">
+          <header class="panel-header">
+            <div>
+              <h2>手势映射配置</h2>
+              <p>为左滑、右滑、握拳等动作自定义快捷操作</p>
+            </div>
+            <button class="btn" id="save-mapping">保存映射</button>
+          </header>
+          <div class="card">
+            <div class="mapping-grid">
+              <div class="mapping-row">
+                <div>
+                  <h4>左滑</h4>
+                  <p>常用于返回、上一页</p>
+                </div>
+                <select>
+                  <option>返回上一页</option>
+                  <option>切换到上一个应用</option>
+                  <option>触发自定义脚本</option>
+                </select>
+              </div>
+              <div class="mapping-row">
+                <div>
+                  <h4>右滑</h4>
+                  <p>常用于前进、下一页</p>
+                </div>
+                <select>
+                  <option>切换到下一页</option>
+                  <option>打开新标签</option>
+                  <option>触发自定义脚本</option>
+                </select>
+              </div>
+              <div class="mapping-row">
+                <div>
+                  <h4>握拳</h4>
+                  <p>适合暂停、锁定</p>
+                </div>
+                <select>
+                  <option>暂停/播放</option>
+                  <option>锁定屏幕</option>
+                  <option>触发自定义脚本</option>
+                </select>
+              </div>
+              <div class="mapping-row">
+                <div>
+                  <h4>张开手</h4>
+                  <p>快速调出常用功能</p>
+                </div>
+                <select>
+                  <option>打开投影</option>
+                  <option>显示桌面</option>
+                  <option>触发自定义脚本</option>
+                </select>
+              </div>
+              <div class="mapping-row">
+                <div>
+                  <h4>OK 手势</h4>
+                  <p>确认、执行操作</p>
+                </div>
+                <select>
+                  <option>确认当前动作</option>
+                  <option>提交表单</option>
+                  <option>触发自定义脚本</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="system" class="panel">
+          <header class="panel-header">
+            <div>
+              <h2>系统设置</h2>
+              <p>启停、敏感度与托盘策略</p>
+            </div>
+            <button class="btn ghost">恢复默认</button>
+          </header>
+          <div class="grid two-columns">
+            <div class="card">
+              <h3>启停与识别策略</h3>
+              <div class="setting-row">
+                <div>
+                  <p class="label">开机自动启动识别</p>
+                  <p class="hint">启动应用后自动开启手势识别</p>
+                </div>
+                <label class="toggle">
+                  <input type="checkbox" checked />
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
+              <div class="setting-row">
+                <div>
+                  <p class="label">识别失败提示</p>
+                  <p class="hint">检测不到手势时弹出提示</p>
+                </div>
+                <label class="toggle">
+                  <input type="checkbox" />
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
+            </div>
+            <div class="card">
+              <h3>托盘与快捷方式</h3>
+              <div class="setting-row">
+                <div>
+                  <p class="label">最小化到系统托盘</p>
+                  <p class="hint">关闭窗口后保持后台运行</p>
+                </div>
+                <label class="toggle">
+                  <input type="checkbox" checked />
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
+              <div class="setting-row">
+                <div>
+                  <p class="label">托盘提示气泡</p>
+                  <p class="hint">识别到手势时显示提醒</p>
+                </div>
+                <label class="toggle">
+                  <input type="checkbox" checked />
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="renderer.js"></script>
+  </body>
+</html>
